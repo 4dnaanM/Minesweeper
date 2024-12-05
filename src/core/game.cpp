@@ -1,14 +1,18 @@
 // AI solver
 // No Guessing Mode
 
+#include <SFML/Graphics.hpp>
 #include <iostream>
 #include <vector>
 #include <random>
+#include <ctime>
+#include <thread>
+#include <chrono>
 
 class Minesweeper{
     
-    int L; 
-    int W;
+    int L = 30; 
+    int W = 12;
     
     //  _ _ _ _ _ _ _ _
     // |_|_|_|_|_|_|_|_| |
@@ -16,15 +20,35 @@ class Minesweeper{
     // |_|_|_|_|_|_|_|_| |
     // <-------L------->
     
-    int totalMines; 
+    int totalMines = 99; 
     
-    bool gameOver; 
-    int remainingMinesCount; 
+    bool gameOver = false; 
+    int remainingMinesCount = 99; 
 
-    int MINE; 
-    int REVEALED;
-    int FLAGGED;
-    int HIDDEN;
+    int MINE = -1; 
+    int REVEALED = 1;
+    int FLAGGED = 2;
+    int HIDDEN = 0;
+
+    std::vector<std::string> TEXTURE_PATHS = {
+        "../assets/0.svg.png",       // Revealed empty cell
+        "../assets/1.svg.png",       // Number 1
+        "../assets/2.svg.png",       // Number 2
+        "../assets/3.svg.png",       // Number 3
+        "../assets/4.svg.png",       // Number 4
+        "../assets/5.svg.png",       // Number 5
+        "../assets/6.svg.png",       // Number 6
+        "../assets/7.svg.png",       // Number 7
+        "../assets/8.svg.png",       // Number 8
+        "../assets/Hidden.svg.png",  // Hidden cell
+        "../assets/Flag.svg.png",    // Flagged cell
+        "../assets/Mine.svg.png"     // Mine
+    };;
+
+    std::vector<sf::Texture> textures; 
+    std::vector<sf::Sprite> sprites; 
+
+    int CELL_SIZE = 40;
 
     std::vector<std::vector<int>> gameBoard; // mine -> -1, else {0,1,2,3,4,5,6,7,8}
     std::vector<std::vector<int>> userBoard; // has values REVEALED, FLAGGED, HIDDEN
@@ -54,7 +78,7 @@ class Minesweeper{
         return 0; 
     }
 
-    bool gameIsComplete(){
+    bool gameIsCorrect(){
         for (int x = 0; x < L; x++){
             for (int y = 0; y < W; y++){
 
@@ -111,13 +135,39 @@ class Minesweeper{
         return;
     }
 
-    int takeInput(int& y, int& x, bool& F){
+    int takeConsoleInput(int& y, int& x, bool& F){
         // if not engine:
         std::cout<<"(F,x,y)=?\n";
         char mark_flag; 
         std::cin>>mark_flag;
         F = (mark_flag=='F');
         std::cin>>x>>y;
+        return 0;
+    }
+
+    int takeInput(int& y, int& x, bool& F, sf::RenderWindow& window){
+        sf::Event event;
+        while(window.waitEvent(event)){
+            if (event.type == sf::Event::Closed){
+                window.close();
+                return 0;
+            }
+            else if (event.type == sf::Event::MouseButtonPressed){
+                int click_x = event.mouseButton.x;
+                int click_y = event.mouseButton.y;
+                
+                x = click_x/CELL_SIZE;
+                y = click_y/CELL_SIZE;
+                std::cout<<"("<<x<<","<<y<<")"<<std::endl;
+                if(event.mouseButton.button == sf::Mouse::Left){
+                    F = false;
+                }
+                else if(event.mouseButton.button == sf::Mouse::Right){
+                    F = true;
+                }
+                return 0;
+            }
+        }
         return 0;
     }
 
@@ -173,7 +223,7 @@ class Minesweeper{
         if(F){
             if(userBoard[y][x]!=FLAGGED)remainingMinesCount--;
             userBoard[y][x] = FLAGGED;
-            printUserBoard(); 
+            // printUserBoard(); 
         }
         else if(gameBoard[y][x]==MINE){
             gameOver = true;
@@ -189,18 +239,43 @@ class Minesweeper{
         return 0;
     }
 
+    int displayWindow(sf::RenderWindow& window){
+        window.clear(sf::Color::White);
+        for (int y = 0; y < W; y++) {
+            for (int x = 0; x < L; x++) {
+                int state; 
+                if(userBoard[y][x]==REVEALED)state = gameBoard[y][x];
+                else if(userBoard[y][x]==FLAGGED)state = 10;
+                else state = 9;
+                
+                sf::Sprite& sprite = sprites[state];
+                sprite.setPosition(x * CELL_SIZE, y * CELL_SIZE);
+                sprite.setScale(
+                    static_cast<float>(CELL_SIZE) / textures[state].getSize().x,
+                    static_cast<float>(CELL_SIZE) / textures[state].getSize().y
+                );
+                window.draw(sprite);
+            }
+        }
+        window.display();
+        return 0; 
+    }
+
 public:
-    Minesweeper():
-        L(30),
-        W(12),
-        totalMines(99),
-        MINE(-1),
-        HIDDEN(0),
-        REVEALED(1),
-        FLAGGED(2),
-        gameOver(false),
-        remainingMinesCount(totalMines)
-    {
+    Minesweeper(){
+        for (auto path : TEXTURE_PATHS) {
+            sf::Texture texture;
+            std::cout << "Loading texture: " << path << "\n";
+            if (!texture.loadFromFile(path)) {
+                std::cerr << "Failed to load texture: " << path << "\n";
+                throw std::runtime_error("Failed to load texture: " + path);
+            }
+            textures.push_back(texture);
+            
+            sf::Sprite sprite(texture);
+            sprites.push_back(sprite);
+        }
+
         userBoard = std::vector<std::vector<int>>(W,std::vector<int>(L,HIDDEN));
         gameBoard = std::vector<std::vector<int>>(W,std::vector<int>(L,0));
         generateMines();
@@ -208,26 +283,38 @@ public:
     }
 
     int run(){
-        while(!gameOver&&remainingMinesCount){
-            int play_x; 
-            int play_y;
-            bool play_F;
-            takeInput(play_y, play_x, play_F);
-            // clear the screen here
-            playInput(play_y,play_x,play_F);
+        int WIDTH = L * CELL_SIZE;
+        int HEIGHT = W * CELL_SIZE;
+        sf::RenderWindow window(sf::VideoMode(WIDTH, HEIGHT), "Minesweeper");
+        displayWindow(window);
+        while(window.isOpen()){
+            std::cout<<"AUKJHFKSHFDWKSDHJF\n";
+            while(!gameOver&&remainingMinesCount){
+                int play_x; 
+                int play_y;
+                bool play_F;
+                takeInput(play_y, play_x, play_F,window);
+                playInput(play_y,play_x,play_F);
+                displayWindow(window);
+            }
+            if(remainingMinesCount==0 && gameIsCorrect()){
+                // win
+                std::cout<<":)\n";
+                break; 
+                // printUserBoard();
+            }
+            else{
+                std::cout<<":(\n";
+                break; 
+                // printUserBoardWithAllMines();
+                // loss
+            }
         }
-        if(remainingMinesCount==0 && gameIsComplete()){
-            // win
-            std::cout<<":)\n";
-            printUserBoard();
-        }
-        else{
-            std::cout<<":(\n";
-            printUserBoardWithAllMines();
-            // loss
-        }
+        std::this_thread::sleep_for(std::chrono::seconds(10));
+        window.close();
         return 0;
     }
+        
 };
 
 
