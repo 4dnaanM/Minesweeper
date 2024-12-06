@@ -61,7 +61,7 @@ A C++ implementation of the classic [Minesweeper](https://en.wikipedia.org/wiki/
 1. Launch the game to see the Minesweeper board rendered in a window.
 2. Controls:
 - **Left-click**: Reveal a cell.
-- **Right-click**: Flag or unflag a hidden cell, or reveal all hidden cells neighbouring a satisfied revealed cell. 
+- **Right-click**: Flag or unflag a hidden cell, or reveal all hidden cells neighbouring a satisfied revealed cell (see: [chording](https://minesweeper.fandom.com/wiki/Chording)). 
 
 The game ends if:
 - All mines are flagged correctly (win).
