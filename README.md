@@ -39,14 +39,16 @@ A C++ implementation of the classic Minesweeper game, using [SFML](https://www.s
    git clone https://github.com/4dnaanM/Minesweeper.git
    cd Minesweeper
    ```
-2. If g++ is set up on your device, use the provided makefile to compile and run: 
+2. If g++ is your preferred C++ compiler, use the provided makefile to compile and run: 
    ```bash
+   cd src/core
    make build
    make run
    ```
    Else, follow step 3 and 4: 
 2. Compile the program using your preferred C++ compiler. Example for g++:
     ```bash
+    cd src/core
     g++ -std=c++14 -I/opt/homebrew/include -L/opt/homebrew/lib -lsfml-graphics -lsfml-window -lsfml-system game.cpp -o game
     ```
     make sure to include and link the correct files.
@@ -88,7 +90,7 @@ assets/
 - Add an AI solver for the game.
 - Implement a "No Guessing" mode to make the game solvable deterministically.
 - Add a Game-Over Screen, Timer, Remaining Mines Counter, Re-start button, Hint button.
-- tarball package instead of source code
+- tarball package instead of source code distribution
 ### Known Issues:
 - Relative paths to the assets/ directory may cause issues if the working directory is incorrect.
 - Window scaling does not work. 
