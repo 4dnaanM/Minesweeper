@@ -20,7 +20,7 @@ class Minesweeper{
     int totalMines = 99; 
     
     bool gameOver = false; 
-    int remainingMinesCount = 99; 
+    int remainingMinesCount = totalMines; 
 
     int MINE = -1; 
     int REVEALED = 1;
@@ -143,6 +143,19 @@ class Minesweeper{
         return 0;
     }
 
+    int getCellCoordinates(int& y, int& x, int click_y, int click_x, sf::RenderWindow& window){
+        sf::View view = window.getView();
+        sf::Vector2f viewSize = view.getSize();
+        sf::Vector2u windowSize = window.getSize();
+
+        float scale_x = viewSize.x / windowSize.x;
+        float scale_y = viewSize.y / windowSize.y;
+        
+        x = click_x*scale_x/CELL_SIZE;
+        y = click_y*scale_y/CELL_SIZE;
+        return 0; 
+    }
+
     int takeInput(int& y, int& x, bool& F, sf::RenderWindow& window){
         sf::Event event;
         while(window.waitEvent(event)){
@@ -153,10 +166,9 @@ class Minesweeper{
             else if (event.type == sf::Event::MouseButtonPressed){
                 int click_x = event.mouseButton.x;
                 int click_y = event.mouseButton.y;
-                
-                x = click_x/CELL_SIZE;
-                y = click_y/CELL_SIZE;
 
+                getCellCoordinates(y,x,click_y,click_x,window);
+                
                 if(event.mouseButton.button == sf::Mouse::Left){
                     F = false;
                 }
@@ -216,7 +228,7 @@ class Minesweeper{
             int n_x = x+x_vals[neighbor];
             int n_y = y+y_vals[neighbor];
             if(inBoard(n_y,n_x)&&userBoard[n_y][n_x]==HIDDEN){
-                // if it is hidden, cl
+                // if it is hidden, click on it.
                 if(gameBoard[n_y][n_x]==MINE){
                     gameOver = true;
                 }
@@ -346,6 +358,7 @@ public:
         sf::RenderWindow window(sf::VideoMode(WIDTH, HEIGHT), "Minesweeper");
 
         displayBoard(window);
+
         while(window.isOpen()){
             while(!gameOver && remainingMinesCount>0){
                 int play_x; 
