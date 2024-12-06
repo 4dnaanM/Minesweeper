@@ -1,8 +1,3 @@
-// Todo: 
-// First click not a mine
-// AI solver
-// No Guessing Mode
-
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <vector>
@@ -52,11 +47,12 @@ class Minesweeper{
 
     int CELL_SIZE = 40;
 
-    std::vector<std::vector<int>> gameBoard; // mine -> -1, else {0,1,2,3,4,5,6,7,8}
-    std::vector<std::vector<int>> userBoard; // has values REVEALED, FLAGGED, HIDDEN
+    std::vector<std::vector<int>> gameBoard                             // mine -> -1, else {0,1,2,3,4,5,6,7,8}
+        = std::vector<std::vector<int>>(W, std::vector<int>(L,0));
+    std::vector<std::vector<int>> userBoard                             // has values REVEALED, FLAGGED, HIDDEN
+        = std::vector<std::vector<int>>(W, std::vector<int>(L,HIDDEN));
 
     int generateMines(){
-        // check mines can be placed
         srand(time(0));
         int placedMines = 0; 
         
@@ -160,7 +156,7 @@ class Minesweeper{
                 
                 x = click_x/CELL_SIZE;
                 y = click_y/CELL_SIZE;
-                // std::cout<<"("<<x<<","<<y<<")"<<std::endl;
+
                 if(event.mouseButton.button == sf::Mouse::Left){
                     F = false;
                 }
@@ -219,11 +215,15 @@ class Minesweeper{
         for (int neighbor = 0; neighbor<8; neighbor++){    
             int n_x = x+x_vals[neighbor];
             int n_y = y+y_vals[neighbor];
-            if(inBoard(n_y,n_x)&&userBoard[n_y][n_x]==HIDDEN&&gameBoard[n_y][n_x]==MINE){
-                gameOver = true;
-                return 0; 
+            if(inBoard(n_y,n_x)&&userBoard[n_y][n_x]==HIDDEN){
+                // if it is hidden, cl
+                if(gameBoard[n_y][n_x]==MINE){
+                    gameOver = true;
+                }
+                else{
+                    updateUserBoard(n_y,n_x);
+                }
             }
-            updateUserBoard(n_y,n_x);
         }
         return 0;
     }
@@ -242,7 +242,7 @@ class Minesweeper{
             int x_vals[] = {-1,0,1,-1,1,-1,0,1};
             int y_vals[] = {-1,-1,-1,0,0,1,1,1};
 
-            for (int neighbor = 0; neighbor<7; neighbor++){
+            for (int neighbor = 0; neighbor<8; neighbor++){
                 int n_x = x+x_vals[neighbor];
                 int n_y = y+y_vals[neighbor];
                 updateUserBoard(n_y,n_x);
@@ -306,7 +306,7 @@ class Minesweeper{
                     static_cast<float>(CELL_SIZE) / textures[state].getSize().y
                 );
                 window.draw(sprite);
-                // std::cout << "Texture drawn successfully: "<<state<<", "<< textures[state].getSize().x << "x" << textures[state].getSize().y << " at ("<< x*CELL_SIZE << "," << y*CELL_SIZE <<")\n";
+                
             }
         }
         window.display();
@@ -319,12 +319,12 @@ public:
     
         for (auto path : TEXTURE_PATHS) {
             sf::Texture texture;
-            // std::cout << "Loading texture: " << path << "\n";
+
             if (!texture.loadFromFile(path)) {
-                // std::cerr << "Failed to load texture: " << path << "\n";
+                std::cerr << "Failed to load texture: " << path << "\n";
                 continue; 
             }
-            // std::cout << "Texture loaded successfully: " << texture.getSize().x << "x" << texture.getSize().y << "\n";
+
             textures.push_back(texture);
             
         }
@@ -345,23 +345,8 @@ public:
         int HEIGHT = W * CELL_SIZE;
         sf::RenderWindow window(sf::VideoMode(WIDTH, HEIGHT), "Minesweeper");
 
-        // //debugging input
-        // window.clear();
-        // for(int i = 0; i<12; i++){
-        //     sf::Sprite sprite = sprites[i];
-        //     sprite.setPosition(i*CELL_SIZE, 0);    
-        //     sprite.setScale(
-        //         static_cast<float>(CELL_SIZE) / textures[i].getSize().x,
-        //         static_cast<float>(CELL_SIZE) / textures[i].getSize().y
-        //     );
-        //     window.draw(sprite);
-        // }
-        // window.display();
-        // //debugging input
-
         displayBoard(window);
         while(window.isOpen()){
-            // std::cout<<"AUKJHFKSHFDWKSDHJF\n";
             while(!gameOver && remainingMinesCount>0){
                 int play_x; 
                 int play_y;
@@ -372,13 +357,11 @@ public:
             }
             if(remainingMinesCount==0 && gameIsCorrect()){
                 // win
-                // std::cout<<":)\n";
                 displayBoard(window);
                 break; 
                 // printUserBoard();
             }
-            else{
-                // std::cout<<":(\n";
+            else{;
                 displayBoard(window);
                 break; 
                 // printUserBoardWithAllMines();
@@ -395,5 +378,6 @@ public:
 
 int main(){
     Minesweeper Minesweeper; 
-    Minesweeper.run(); 
+    Minesweeper.run();
+    
 }
