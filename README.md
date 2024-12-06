@@ -1,7 +1,7 @@
 # Minesweeper
 ## Interactive Minesweeper
 
-A C++ implementation of the classic Minesweeper game, using [SFML](https://www.sfml-dev.org/) for rendering and user interaction. This project includes a fully functional game engine and an interactive graphical interface.
+A C++ implementation of the classic [Minesweeper](https://en.wikipedia.org/wiki/Minesweeper_(video_game)) game, using [SFML](https://www.sfml-dev.org/) for rendering and user interaction. This project includes a fully functional game engine and an interactive graphical interface.
 
 ---
 
@@ -103,4 +103,4 @@ This project is open-source. You are free to use, modify, and distribute it unde
 - SFML for its simplicity and power in handling graphics and input.
 - Classic Minesweeper for the inspiration
 - Wikipedia Commons, for the Assets
-- ChatGPT for writing this Readme ;)  
+- ChatGPT for help writing this Readme ;)  
