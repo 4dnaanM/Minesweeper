@@ -28,18 +28,18 @@ class Minesweeper{
     int HIDDEN = 0;
 
     std::vector<std::string> TEXTURE_PATHS = {
-        "../assets/0.svg.png",       // Revealed empty cell
-        "../assets/1.svg.png",       // Number 1
-        "../assets/2.svg.png",       // Number 2
-        "../assets/3.svg.png",       // Number 3
-        "../assets/4.svg.png",       // Number 4
-        "../assets/5.svg.png",       // Number 5
-        "../assets/6.svg.png",       // Number 6
-        "../assets/7.svg.png",       // Number 7
-        "../assets/8.svg.png",       // Number 8
-        "../assets/Hidden.svg.png",  // Hidden cell
-        "../assets/Flag.svg.png",    // Flagged cell
-        "../assets/Mine.svg.png"     // Mine
+        "assets/0.svg.png",       // Revealed empty cell
+        "assets/1.svg.png",       // Number 1
+        "assets/2.svg.png",       // Number 2
+        "assets/3.svg.png",       // Number 3
+        "assets/4.svg.png",       // Number 4
+        "assets/5.svg.png",       // Number 5
+        "assets/6.svg.png",       // Number 6
+        "assets/7.svg.png",       // Number 7
+        "assets/8.svg.png",       // Number 8
+        "assets/Hidden.svg.png",  // Hidden cell
+        "assets/Flag.svg.png",    // Flagged cell
+        "assets/Mine.svg.png"     // Mine
     };
 
     std::vector<sf::Texture> textures; 

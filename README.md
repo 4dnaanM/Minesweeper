@@ -30,7 +30,7 @@ A C++ implementation of the classic [Minesweeper](https://en.wikipedia.org/wiki/
 2. Ensure C++14 is supported by your compiler.
 
 ### Project Structure
-- **`game.cpp`**: Contains all the logic and rendering code.
+- **`src/core/game.cpp`**: Contains all the logic and rendering code.
 - **`assets/`**: Directory for texture files used for the game board.
 
 ### Building the Project
@@ -41,20 +41,18 @@ A C++ implementation of the classic [Minesweeper](https://en.wikipedia.org/wiki/
    ```
 2. If g++ is your preferred C++ compiler, use the provided makefile to compile and run: 
    ```bash
-   cd src/core
    make build
    make run
    ```
    Else, follow step 3 and 4: 
-2. Compile the program using your preferred C++ compiler. Example for g++:
+3. Compile the program using your preferred C++ compiler. Example for g++:
     ```bash
-    cd src/core
-    g++ -std=c++14 -I/opt/homebrew/include -L/opt/homebrew/lib -lsfml-graphics -lsfml-window -lsfml-system game.cpp -o minesweeper
+    g++ -std=c++14 -I/opt/homebrew/include -L/opt/homebrew/lib -lsfml-graphics -lsfml-window -lsfml-system src/core/game.cpp -o bin/minesweeper
     ```
-    make sure to include and link the correct files.
-3. Run the executable: 
+    make sure to include and link the correct files as shown above. If all goes well, you should have an executable in the bin folder.
+4. Run the executable: 
     ```bash
-    ./minesweeper
+    ./bin/minesweeper
     ```
 
 ## Gameplay Instructions
@@ -93,7 +91,6 @@ assets/
 - tarball package instead of source code distribution
 ### Known Issues:
 - Relative paths to the assets/ directory may cause issues if the working directory is incorrect.
-- Window scaling does not work. 
 - Window sometimes refuses to close. (End the terminal process using Ctrl+C)
 ## Contributions
 Contributions are welcome! Feel free to open issues or submit pull requests to improve the project.
