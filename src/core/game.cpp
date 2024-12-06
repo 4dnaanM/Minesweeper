@@ -20,7 +20,7 @@ class Minesweeper{
     // |_|_|_|_|_|_|_|_| |
     // <-------L------->
     
-    int totalMines = 99; 
+    int totalMines = 50; 
     
     bool gameOver = false; 
     int remainingMinesCount = 99; 
@@ -175,9 +175,9 @@ class Minesweeper{
         return (x>=0)&&(x<L)&&(y>=0)&&(y<W);
     }
 
-    int countNeighbouringMines(int y, int x){
+    int countNeighbouringFlags(int y, int x){
         
-        int neighbouringMines = 0; 
+        int neighbouring = 0; 
 
         int x_vals[] = {-1,0,1,-1,1,-1,0,1};
         int y_vals[] = {-1,-1,-1,0,0,1,1,1};
@@ -186,16 +186,50 @@ class Minesweeper{
             int n_x = x+x_vals[neighbor];
             int n_y = y+y_vals[neighbor];
             if(inBoard(n_y,n_x)){
-                neighbouringMines+=(gameBoard[n_y][n_x]==MINE);
+                neighbouring+=(userBoard[n_y][n_x]==FLAGGED);
             }
         }
-        return neighbouringMines;
+        return neighbouring;
+    }
+    
+    int countNeighbouringMines(int y, int x){
+        
+        int neighbouring = 0; 
+
+        int x_vals[] = {-1,0,1,-1,1,-1,0,1};
+        int y_vals[] = {-1,-1,-1,0,0,1,1,1};
+
+        for (int neighbor = 0; neighbor<8; neighbor++){    
+            int n_x = x+x_vals[neighbor];
+            int n_y = y+y_vals[neighbor];
+            if(inBoard(n_y,n_x)){
+                neighbouring+=(gameBoard[n_y][n_x]==MINE);
+            }
+        }
+        return neighbouring;
+    }
+
+    int chord(int y, int x){
+
+        int x_vals[] = {-1,0,1,-1,1,-1,0,1};
+        int y_vals[] = {-1,-1,-1,0,0,1,1,1};
+
+        for (int neighbor = 0; neighbor<8; neighbor++){    
+            int n_x = x+x_vals[neighbor];
+            int n_y = y+y_vals[neighbor];
+            if(inBoard(n_y,n_x)&&userBoard[n_y][n_x]==HIDDEN&&gameBoard[n_y][n_x]==MINE){
+                gameOver = true;
+                return 0; 
+            }
+            updateUserBoard(n_y,n_x);
+        }
+        return 0;
     }
 
     int updateUserBoard(int y,int x){
         if(!inBoard(y,x))return 0;
         
-        if(userBoard[y][x]==REVEALED)return 0;
+        if(userBoard[y][x]!=HIDDEN)return 0;
         
         userBoard[y][x]=REVEALED;
 
@@ -221,20 +255,34 @@ class Minesweeper{
             return 0;
         }
         if(F){
-            if(userBoard[y][x]!=FLAGGED)remainingMinesCount--;
-            userBoard[y][x] = FLAGGED;
+            if(userBoard[y][x]==HIDDEN){
+                remainingMinesCount--;
+                userBoard[y][x] = FLAGGED;
+            }
+            else if(userBoard[y][x]==FLAGGED){
+                remainingMinesCount++;
+                userBoard[y][x] = HIDDEN;
+            }
+            else{
+                // userBoard[y][x] is REVEALED
+                // shows number of neighbors
+                // chording
+
+                int nFlags = countNeighbouringFlags(y,x);
+                if(nFlags==gameBoard[y][x])chord(y,x);
+            }
             // printUserBoard(); 
         }
-        else if(gameBoard[y][x]==MINE){
-            gameOver = true;
-        }
-        else if(userBoard[y][x]!=HIDDEN){
-            // if(userBoard[y][x]==REVEALED)std::cout<<"Square already revealed!\n";// chording later
-            // else std::cout<<"Square flagged!\n";
-        }
-        else{
-            updateUserBoard(y,x);
-            // printUserBoard(); 
+        else {
+            if(gameBoard[y][x]==MINE){
+                gameOver = true;
+            }
+            else if(userBoard[y][x]==HIDDEN){
+                updateUserBoard(y,x);
+                // printUserBoard(); 
+                
+            }
+            // revealed square left click: do nothing
         }
         return 0;
     }
