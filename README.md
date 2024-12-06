@@ -39,10 +39,17 @@ A C++ implementation of the classic Minesweeper game, using [SFML](https://www.s
    git clone https://github.com/4dnaanM/Minesweeper.git
    cd Minesweeper
    ```
+2. If g++ is set up on your device, use the provided makefile to compile and run: 
+   ```bash
+   make build
+   make run
+   ```
+   Else, follow step 3 and 4: 
 2. Compile the program using your preferred C++ compiler. Example for g++:
     ```bash
-    g++ -std=c++14 game.cpp -o minesweeper -lsfml-graphics -lsfml-window -lsfml-system
+    g++ -std=c++14 -I/opt/homebrew/include -L/opt/homebrew/lib -lsfml-graphics -lsfml-window -lsfml-system game.cpp -o game
     ```
+    make sure to include and link the correct files.
 3. Run the executable: 
     ```bash
     ./minesweeper
