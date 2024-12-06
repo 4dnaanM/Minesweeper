@@ -90,7 +90,6 @@ assets/
 - Add a Game-Over Screen, Timer, Remaining Mines Counter, Re-start button, Hint button.
 - tarball package instead of source code distribution
 ### Known Issues:
-- Relative paths to the assets/ directory may cause issues if the working directory is incorrect.
 - Window sometimes refuses to close. (End the terminal process using Ctrl+C)
 ## Contributions
 Contributions are welcome! Feel free to open issues or submit pull requests to improve the project.
