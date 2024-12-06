@@ -1,3 +1,5 @@
+// Todo: 
+// First click not a mine
 // AI solver
 // No Guessing Mode
 
@@ -12,7 +14,7 @@
 class Minesweeper{
     
     int L = 30; 
-    int W = 12;
+    int W = 16;
     
     //  _ _ _ _ _ _ _ _
     // |_|_|_|_|_|_|_|_| |
@@ -20,7 +22,7 @@ class Minesweeper{
     // |_|_|_|_|_|_|_|_| |
     // <-------L------->
     
-    int totalMines = 50; 
+    int totalMines = 99; 
     
     bool gameOver = false; 
     int remainingMinesCount = 99; 
@@ -360,7 +362,7 @@ public:
         displayBoard(window);
         while(window.isOpen()){
             // std::cout<<"AUKJHFKSHFDWKSDHJF\n";
-            while(!gameOver&&remainingMinesCount){
+            while(!gameOver && remainingMinesCount>0){
                 int play_x; 
                 int play_y;
                 bool play_F;
