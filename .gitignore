@@ -33,5 +33,5 @@
 
 .vscode
 references
-src/core/later
-*ignore
+*ignore*
+src/core/try.cpp

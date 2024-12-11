@@ -47,7 +47,7 @@ A C++ implementation of the classic [Minesweeper](https://en.wikipedia.org/wiki/
    Else, follow step 3 and 4: 
 3. Compile the program using your preferred C++ compiler. Example for g++:
     ```bash
-    g++ -std=c++14 -I/opt/homebrew/include -L/opt/homebrew/lib -lsfml-graphics -lsfml-window -lsfml-system src/core/game.cpp -o bin/minesweeper
+    g++ -std=c++14 -I/opt/homebrew/include -L/opt/homebrew/lib -lsfml-graphics -lsfml-window -lsfml-system src/core/game.cpp src/gui/gui.cpp -o bin/minesweeper
     ```
     make sure to include and link the correct files as shown above. If all goes well, you should have an executable in the bin folder.
 4. Run the executable: 
@@ -85,8 +85,8 @@ assets/
 ## Known Issues and Future Improvements
 ### To-Do:
 - Ensure the first click is never on a mine.
-- Add an AI solver for the game.
-- Implement a "No Guessing" mode to make the game solvable deterministically.
+- Add a solver for the game.
+- Implement "No Guessing" mode.
 - Add a Game-Over Screen, Timer, Remaining Mines Counter, Re-start button, Hint button.
 - tarball package instead of source code distribution
 ### Known Issues:
