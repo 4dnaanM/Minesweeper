@@ -2,6 +2,14 @@
 #include <iostream>
 #include <vector>
 
+class AbstractGUI{
+public: 
+    virtual int takeInteractiveInput(int& y, int& x, bool& F) = 0;
+    virtual int displayBoard(int gameOver, std::vector<std::vector<int>>& gameBoard, std::vector<std::vector<int>>& userBoard) = 0;
+    virtual void closeWindow() = 0;
+    virtual bool windowIsOpen() = 0;
+};
+
 class MinesweeperGUI{
     std::vector<std::string> TEXTURE_PATHS = {
         "assets/0.svg.png",       // Revealed empty cell

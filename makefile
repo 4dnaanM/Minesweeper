@@ -1,7 +1,7 @@
 CC = g++
 CFLAGS = -std=c++14 -I/opt/homebrew/include -L/opt/homebrew/lib
 LINKS = -lsfml-graphics -lsfml-window -lsfml-system
-SRC = src/core/game.cpp src/gui/gui.cpp
+SRC = src/core/game.cpp src/gui/gui.cpp src/engine/engine.cpp
 BIN = bin
 
 build:

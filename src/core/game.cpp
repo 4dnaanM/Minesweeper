@@ -6,6 +6,7 @@
 #include <ctime>
 
 #include "../gui/gui.cpp"
+#include "../engine/engine.cpp"
 
 // update: Refactor: base minesweeper, run can be engine or interactive
 
@@ -157,7 +158,7 @@ class Minesweeper{
         return 0;
     }
 
-    int playInput(int& y, int& x, bool& F){
+    int playInput(int y, int x, bool F){
         if(!inBoard(y,x)){
             // std::cout<<"Out of board!\n";
             return 0;
@@ -201,7 +202,7 @@ public:
         generateMines();
     }
 
-    int run(){
+    int runGUI(){
 
         MinesweeperGUI GUI(L,W,MINE,HIDDEN,FLAGGED);
 
@@ -231,11 +232,56 @@ public:
         GUI.closeWindow();
         return 0;
     }
+
+    int runEngine(){
+        MinesweeperGUI GUI(L,W,MINE,HIDDEN,FLAGGED);
+        HelperEngine engine(L,W);
+
+        GUI.displayBoard(gameOver, gameBoard, userBoard);
+
+        while(GUI.windowIsOpen()){
+            while(!gameOver && remainingMinesCount>0){
+                int play_x; 
+                int play_y;
+                bool play_F;
+                GUI.takeInteractiveInput(play_y, play_x, play_F);
+                playInput(play_y,play_x,play_F);
+                GUI.displayBoard(gameOver, gameBoard, userBoard);
+                // std::this_thread::sleep_for(std::chrono::milliseconds(500));
+                std::vector<std::tuple<int,int,int>> moves = engine.makeMove(userBoard);
+
+                for(auto move: moves){
+                    // if(std::get<2>(move)==1)std::cout<<"Flagging ";
+                    // else std::cout<<"Clicking ";
+                    // std::cout<<"("<<std::get<1>(move)<<","<<std::get<0>(move)<<")\n";
+                    playInput(std::get<0>(move),std::get<1>(move),std::get<2>(move)==1);
+                    
+                    GUI.displayBoard(gameOver, gameBoard, userBoard);
+                    if(gameOver)break;
+                    // std::this_thread::sleep_for(std::chrono::milliseconds(500));
+                }
+            }
+            if(remainingMinesCount==0 && gameIsCorrect()){
+                // win
+                GUI.displayBoard(gameOver, gameBoard, userBoard);
+                break; 
+            }
+            else{
+                // loss
+                GUI.displayBoard(gameOver, gameBoard, userBoard);
+                break; 
+            }
+        }
+        std::this_thread::sleep_for(std::chrono::seconds(3));
+        GUI.closeWindow();
+        return 0;
+    }
         
 };
 
+
 int main(){
     Minesweeper Minesweeper; 
-    Minesweeper.run();
+    Minesweeper.runEngine();
 }
 
