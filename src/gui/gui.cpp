@@ -5,7 +5,7 @@
 class AbstractGUI{
 public: 
     virtual int takeInteractiveInput(int& y, int& x, bool& F) = 0;
-    virtual int displayBoard(int gameOver, std::vector<std::vector<int>>& gameBoard, std::vector<std::vector<int>>& userBoard) = 0;
+    virtual int displayBoard(const int gameOver, const std::vector<std::vector<int>>& gameBoard, const std::vector<std::vector<int>>& userBoard) = 0;
     virtual void closeWindow() = 0;
     virtual bool windowIsOpen() = 0;
 };
@@ -77,7 +77,7 @@ public:
         return 0;
     }
 
-    int displayBoard(int gameOver, std::vector<std::vector<int>>& gameBoard, std::vector<std::vector<int>>& userBoard){
+    int displayBoard(const int gameOver, const std::vector<std::vector<int>>& gameBoard, const std::vector<std::vector<int>>& userBoard){
         window.clear(sf::Color::White);
         for (int y = 0; y < W; y++) {
             for (int x = 0; x < L; x++) {

@@ -85,7 +85,7 @@ protected:
         return flaggedNeighbors<= userBoard[y][x] && flaggedNeighbors+hiddenNeighbors+cantFlagNeighbors >= userBoard[y][x];
     }
 
-    virtual std::vector<std::tuple<int,int,int>> makeMove(const std::vector<std::vector<int>>& userBoard) = 0;
+    virtual std::vector<std::tuple<int,int,int>> returnMoves(const std::vector<std::vector<int>>& userBoard) = 0;
 
 public:
     AbstractEngine(int L, int W):L(L),W(W){}
@@ -96,26 +96,35 @@ class HelperEngine: public AbstractEngine{
 public:    
     HelperEngine(int L, int W):AbstractEngine(L,W){}
     
-    std::vector<std::tuple<int,int,int>> makeMove(const std::vector<std::vector<int>>& userBoard){
+    std::vector<std::tuple<int,int,int>> returnMoves(const std::vector<std::vector<int>>& userBoard){
         std::vector<std::vector<int>> ourBoard = userBoard; 
         std::set<std::tuple<int,int,int>> moves;
-        for(int y = 0; y<W; y++){
-            for(int x = 0; x<L; x++){
-                if(ourBoard[y][x]==HIDDEN || ourBoard[y][x]==FLAGGED || ourBoard[y][x]==CANTFLAG)continue;
-                if(baseCheckFlagNeighbors(y,x,ourBoard)){
-                    std::vector<std::pair<int,int>>hiddenNeighbors = getAllHiddenNeighbors(y,x,ourBoard);
-                    for(auto neighbor: hiddenNeighbors){
-                        int n_x = neighbor.second; 
-                        int n_y = neighbor.first; 
-                        ourBoard[n_y][n_x]=FLAGGED; 
-                        if (moves.find(std::make_tuple(n_y, n_x, 1)) == moves.end()) {
+        int earlierSize = -1; 
+        while(earlierSize<static_cast<int>(moves.size())){
+            earlierSize = static_cast<int>(moves.size()); 
+            for(int y = 0; y<W; y++){
+                for(int x = 0; x<L; x++){
+                    if(ourBoard[y][x]==HIDDEN || ourBoard[y][x]==FLAGGED || ourBoard[y][x]==CANTFLAG)continue;
+                    if(baseCheckFlagNeighbors(y,x,ourBoard)){
+                        std::vector<std::pair<int,int>>hiddenNeighbors = getAllHiddenNeighbors(y,x,ourBoard);
+                        for(auto neighbor: hiddenNeighbors){
+                            int n_x = neighbor.second; 
+                            int n_y = neighbor.first; 
+                            ourBoard[n_y][n_x]=FLAGGED;
+                            moves.insert(std::make_tuple(n_y, n_x, 1));
                         }
-                        moves.insert(std::make_tuple(n_y, n_x, 1));
                     }
-                }
-                if(baseCheckSatisfied(y,x,ourBoard)){
-                    std::vector<std::pair<int,int>>hiddenNeighbors = getAllHiddenNeighbors(y,x,ourBoard);
-                    moves.insert(std::make_tuple(y,x,1));
+
+                    if(baseCheckSatisfied(y,x,ourBoard)){
+                        std::vector<std::pair<int,int>>hiddenNeighbors = getAllHiddenNeighbors(y,x,ourBoard);
+                        for(auto neighbor: hiddenNeighbors){
+                            int n_x = neighbor.second; 
+                            int n_y = neighbor.first; 
+                            ourBoard[n_y][n_x]=CANTFLAG; 
+                            moves.insert(std::make_tuple(n_y, n_x, 0));
+                        }
+                        // moves.insert(std::make_tuple(y,x,1));
+                    }
                 }
             }
         }
@@ -256,26 +265,35 @@ class ProbabilisticEngine: public AbstractEngine{
 public: 
     ProbabilisticEngine(int L, int W):AbstractEngine(L,W){}
     
-    std::vector<std::tuple<int,int,int>> makeMove(const std::vector<std::vector<int>>& userBoard){
+    std::vector<std::tuple<int,int,int>> returnMoves(const std::vector<std::vector<int>>& userBoard){
         std::vector<std::vector<int>> ourBoard = userBoard; 
         std::set<std::tuple<int,int,int>> moves;
-        for(int y = 0; y<W; y++){
-            for(int x = 0; x<L; x++){
-                if(ourBoard[y][x]==HIDDEN || ourBoard[y][x]==FLAGGED || ourBoard[y][x]==CANTFLAG)continue;
-                if(baseCheckFlagNeighbors(y,x,ourBoard)){
-                    std::vector<std::pair<int,int>>hiddenNeighbors = getAllHiddenNeighbors(y,x,ourBoard);
-                    for(auto neighbor: hiddenNeighbors){
-                        int n_x = neighbor.second; 
-                        int n_y = neighbor.first; 
-                        ourBoard[n_y][n_x]=FLAGGED; 
-                        if (moves.find(std::make_tuple(n_y, n_x, 1)) == moves.end()) {
+        int earlierSize = -1; 
+        while(earlierSize<static_cast<int>(moves.size())){
+            earlierSize = static_cast<int>(moves.size()); 
+            for(int y = 0; y<W; y++){
+                for(int x = 0; x<L; x++){
+                    if(ourBoard[y][x]==HIDDEN || ourBoard[y][x]==FLAGGED || ourBoard[y][x]==CANTFLAG)continue;
+                    if(baseCheckFlagNeighbors(y,x,ourBoard)){
+                        std::vector<std::pair<int,int>>hiddenNeighbors = getAllHiddenNeighbors(y,x,ourBoard);
+                        for(auto neighbor: hiddenNeighbors){
+                            int n_x = neighbor.second; 
+                            int n_y = neighbor.first; 
+                            ourBoard[n_y][n_x]=FLAGGED;
+                            moves.insert(std::make_tuple(n_y, n_x, 1));
                         }
-                        moves.insert(std::make_tuple(n_y, n_x, 1));
                     }
-                }
-                if(baseCheckSatisfied(y,x,ourBoard)){
-                    std::vector<std::pair<int,int>>hiddenNeighbors = getAllHiddenNeighbors(y,x,ourBoard);
-                    moves.insert(std::make_tuple(y,x,1));
+
+                    if(baseCheckSatisfied(y,x,ourBoard)){
+                        std::vector<std::pair<int,int>>hiddenNeighbors = getAllHiddenNeighbors(y,x,ourBoard);
+                        for(auto neighbor: hiddenNeighbors){
+                            int n_x = neighbor.second; 
+                            int n_y = neighbor.first; 
+                            ourBoard[n_y][n_x]=CANTFLAG; 
+                            moves.insert(std::make_tuple(n_y, n_x, 0));
+                        }
+                        // moves.insert(std::make_tuple(y,x,1));
+                    }
                 }
             }
         }
