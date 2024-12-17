@@ -98,6 +98,6 @@ public:
 
 int main(){
     Minesweeper Minesweeper; 
-    Minesweeper.runEngine();
+    Minesweeper.runGUI();
 }
 
