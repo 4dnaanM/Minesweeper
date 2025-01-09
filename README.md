@@ -1,25 +1,17 @@
 # Minesweeper
 ## Interactive Minesweeper
 
-A C++ implementation of the classic [Minesweeper](https://en.wikipedia.org/wiki/Minesweeper_(video_game)) game, using [SFML](https://www.sfml-dev.org/) for rendering and user interaction. This project includes a fully functional game engine and an interactive graphical interface.
+A C++ implementation of the classic [Minesweeper](https://en.wikipedia.org/wiki/Minesweeper_(video_game)) game, using [SFML](https://www.sfml-dev.org/) for rendering and user interaction. This project includes a fully functional game engine and an interactive graphical interface.\
+My motivation to build this was that I was curious to try out the process of building an engine to solve Minesweeper optimally. 
 
 ---
 
 ## Features
 
-- **Fully Functional Minesweeper Logic**:
-  - Automatic generation of a 16x30 game board with 99 mines placed randomly.
-  - User board with states: Hidden, Flagged, and Revealed.
-  - Supports flagging cells and revealing multiple cells.
-
-- **Graphical User Interface**:
-  - Renders the board using `SFML` sprites.
-  - Mouse-based interaction to reveal or flag cells.
-
-- **Game Dynamics**:
-  - Win by correctly flagging all mines.
-  - Lose by clicking on a mine.
-  - Game updates dynamically based on user inputs.
+- **Fully Functional Minesweeper Logic**: 16x30 game board with 99 mines
+- **Game Dynamics**: Dynamic updates of game board when you flag or reveals cells. Win by correctly flagging all mines.
+- **Graphical User Interface**: To visualize the game board and flag or reveal cells through Mouse Clicks. 
+- **Helper Engine**: Option to set engine to play deterministic moves quickly. Developing more functionality
 
 ## Installation and Setup
 
@@ -30,8 +22,14 @@ A C++ implementation of the classic [Minesweeper](https://en.wikipedia.org/wiki/
 2. Ensure C++14 is supported by your compiler.
 
 ### Project Structure
-- **`src/core/game.cpp`**: Contains all the logic and rendering code.
 - **`assets/`**: Directory for texture files used for the game board.
+- **`src/core/game.cpp`**: Contains all the logic and rendering code.
+- **`src/gui/gui.cpp`**: Code that implements interactive GUI.
+- **`src/engine/engine.cpp`**:
+  - Basic Engine Implementation that makes deterministic moves. Will add hint option to GUI later.
+  - In process: Adding more deterministic moves from modeling revealed board as set of constraints on cells.
+  - In process: (Exponential-time) solver that calculates probabilities for each cell. 
+  - Future: Compare and test various heuristic-based AI Solvers.
 
 ### Building the Project
 1. Clone the repository:
@@ -50,7 +48,7 @@ A C++ implementation of the classic [Minesweeper](https://en.wikipedia.org/wiki/
     g++ -std=c++14 -I/opt/homebrew/include -L/opt/homebrew/lib -lsfml-graphics -lsfml-window -lsfml-system src/core/game.cpp src/gui/gui.cpp -o bin/minesweeper
     ```
     make sure to include and link the correct files as shown above. If all goes well, you should have an executable in the bin folder.
-4. Run the executable: 
+4. Run the executable: This will allow you to use the GUI and play the game. Engine is not enabled by default.
     ```bash
     ./bin/minesweeper
     ```
@@ -85,12 +83,11 @@ assets/
 ## Known Issues and Future Improvements
 ### To-Do:
 - Ensure the first click is never on a mine.
-- Add a solver for the game.
 - Implement "No Guessing" mode.
 - Add a Game-Over Screen, Timer, Remaining Mines Counter, Re-start button, Hint button.
 - tarball package instead of source code distribution
 ### Known Issues:
-- Window sometimes refuses to close. (End the terminal process using Ctrl+C)
+- Window refuses to close. (End the terminal process using Ctrl+C)
 ## Contributions
 Contributions are welcome! Feel free to open issues or submit pull requests to improve the project.
 ## License
@@ -99,4 +96,3 @@ This project is open-source. You are free to use, modify, and distribute it unde
 - SFML for its simplicity and power in handling graphics and input.
 - Classic Minesweeper for the inspiration
 - Wikipedia Commons, for the Assets
-- ChatGPT for help writing this Readme ;)  
