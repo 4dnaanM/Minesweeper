@@ -18,43 +18,12 @@ struct GameParams{
 };
 
 struct GUIParams{
-    int CELL_SIZE;
-    int L; 
-    int W; 
-    std::vector<std::string> TEXTURE_PATHS = {
-        "assets/0.svg.png",       // Revealed empty cell
-        "assets/1.svg.png",       // Number 1
-        "assets/2.svg.png",       // Number 2
-        "assets/3.svg.png",       // Number 3
-        "assets/4.svg.png",       // Number 4
-        "assets/5.svg.png",       // Number 5
-        "assets/6.svg.png",       // Number 6
-        "assets/7.svg.png",       // Number 7
-        "assets/8.svg.png",       // Number 8
-        "assets/Hidden.svg.png",  // Hidden cell
-        "assets/Flag.svg.png",    // Flagged cell
-        "assets/Mine.svg.png"     // Mine
-    };
-    std::vector<sf::Texture> textures;
-    std::vector<sf::Sprite> sprites;
+    int CELL_SIZE=40;
+    int L=30; 
+    int W=16; 
     
-    GUIParams(int L,int W,int CELL_SIZE){
-        CELL_SIZE = CELL_SIZE;
-        L = L; 
-        W = W;
-        for (auto path : TEXTURE_PATHS) {
-            sf::Texture texture;
-            textures.push_back(texture);
-        }
-        for(int i = 0; i< textures.size(); i++){
-            sf::Sprite sprite(textures[i]);
-            sprites.push_back(sprite);
-        }
-    }
-
-    GUIParams(){
-        GUIParams(30,16,40);
-    }
+    GUIParams(int L,int W,int CELL_SIZE):CELL_SIZE(CELL_SIZE),L(L),W(W){}
+    GUIParams():CELL_SIZE(40),L(30),W(16){}
 };
 
 enum GameCellState{
@@ -96,4 +65,5 @@ typedef std::vector<std::vector<GameCellState>> GameBoard;
 typedef std::vector<std::vector<UserCellState>> UserBoard;
 
 typedef std::tuple<int,int,ClickType> Move;
+
 #endif

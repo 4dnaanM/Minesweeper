@@ -1,3 +1,6 @@
+#ifndef MINE_SWEEPER
+#define MINE_SWEEPER
+
 #include <iostream>
 #include <vector>
 #include <random>
@@ -96,3 +99,4 @@ int main(){
     Minesweeper.runGUI();
 }
 
+#endif

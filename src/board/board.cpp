@@ -1,3 +1,6 @@
+#ifndef BOARD
+#define BOARD
+
 #include "../utils/utils.cpp"
 
 #include <iostream>
@@ -9,6 +12,10 @@
 #include <cassert>
 
 class MinesweeperBoard{
+
+
+    std::vector<int> traverse_x = {-1,0,1,-1,1,-1,0,1};
+    std::vector<int> traverse_y = {-1,-1,-1,0,0,1,1,1};
 
     int generateMines(){
         srand(time(0));
@@ -42,12 +49,9 @@ class MinesweeperBoard{
         
         int neighbouring = 0; 
 
-        int x_vals[] = {-1,0,1,-1,1,-1,0,1};
-        int y_vals[] = {-1,-1,-1,0,0,1,1,1};
-
         for (int neighbor = 0; neighbor<8; neighbor++){    
-            int n_x = x+x_vals[neighbor];
-            int n_y = y+y_vals[neighbor];
+            int n_x = x+traverse_x[neighbor];
+            int n_y = y+traverse_y[neighbor];
             if(inBoard(n_y,n_x)){
                 neighbouring+=(userBoard[n_y][n_x]==USER_FLAGGED);
             }
@@ -59,12 +63,9 @@ class MinesweeperBoard{
         
         int neighbouring = 0; 
 
-        int x_vals[] = {-1,0,1,-1,1,-1,0,1};
-        int y_vals[] = {-1,-1,-1,0,0,1,1,1};
-
         for (int neighbor = 0; neighbor<8; neighbor++){    
-            int n_x = x+x_vals[neighbor];
-            int n_y = y+y_vals[neighbor];
+            int n_x = x+traverse_x[neighbor];
+            int n_y = y+traverse_y[neighbor];
             if(inBoard(n_y,n_x)){
                 neighbouring += (gameBoard[n_y][n_x] == GAME_MINE);
             }
@@ -75,12 +76,9 @@ class MinesweeperBoard{
 
     int chord(int y, int x, bool& gameOver){
 
-        int x_vals[] = {-1,0,1,-1,1,-1,0,1};
-        int y_vals[] = {-1,-1,-1,0,0,1,1,1};
-
         for (int neighbor = 0; neighbor<8; neighbor++){    
-            int n_x = x+x_vals[neighbor];
-            int n_y = y+y_vals[neighbor];
+            int n_x = x+traverse_x[neighbor];
+            int n_y = y+traverse_x[neighbor];
             if(inBoard(n_y,n_x)&&userBoard[n_y][n_x]==USER_HIDDEN){
                 // if it is hidden, click on it.
                 if(gameBoard[n_y][n_x]==GAME_MINE){
@@ -105,13 +103,9 @@ class MinesweeperBoard{
         int neighbouringMines = countNeighbouringMines(y,x); 
 
         if(neighbouringMines==0){
-
-            int x_vals[] = {-1,0,1,-1,1,-1,0,1};
-            int y_vals[] = {-1,-1,-1,0,0,1,1,1};
-
             for (int neighbor = 0; neighbor<8; neighbor++){
-                int n_x = x+x_vals[neighbor];
-                int n_y = y+y_vals[neighbor];
+                int n_x = x+traverse_x[neighbor];
+                int n_y = y+traverse_y[neighbor];
                 updateUserBoard(n_y,n_x);
             }
         }
@@ -210,7 +204,6 @@ public:
         int x = std::get<1>(M);
         ClickType C = std::get<2>(M);
 
-
         if(!inBoard(y,x)){
             // std::cout<<"Out of board!\n";
             return 0;
@@ -243,3 +236,5 @@ public:
     }
         
 };
+
+#endif
