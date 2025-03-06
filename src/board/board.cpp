@@ -3,13 +3,6 @@
 
 #include "../utils/utils.cpp"
 
-#include <iostream>
-#include <vector>
-#include <random>
-#include <chrono>
-#include <thread>
-#include <ctime>
-#include <cassert>
 
 class MinesweeperBoard{
 
@@ -78,7 +71,7 @@ class MinesweeperBoard{
 
         for (int neighbor = 0; neighbor<8; neighbor++){    
             int n_x = x+traverse_x[neighbor];
-            int n_y = y+traverse_x[neighbor];
+            int n_y = y+traverse_y[neighbor];
             if(inBoard(n_y,n_x)&&userBoard[n_y][n_x]==USER_HIDDEN){
                 // if it is hidden, click on it.
                 if(gameBoard[n_y][n_x]==GAME_MINE){
@@ -219,7 +212,7 @@ public:
             }
             else{
                 int nFlags = countNeighbouringFlags(y,x);
-                if(nFlags==gameBoard[y][x])chord(y,x,params.gameOver);
+                if(convertToGameCellState(nFlags)==gameBoard[y][x])chord(y,x,params.gameOver);
             }
         }
         else {

@@ -35,3 +35,4 @@
 references
 *ignore*
 src/core/try.cpp
+bin/minesweeper.dSYM/

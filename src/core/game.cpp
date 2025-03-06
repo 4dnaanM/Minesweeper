@@ -1,17 +1,9 @@
-#ifndef MINE_SWEEPER
-#define MINE_SWEEPER
-
-#include <iostream>
-#include <vector>
-#include <random>
-#include <chrono>
-#include <thread>
-#include <ctime>
+#ifndef MINESWEEPER
+#define MINESWEEPER
 
 #include "../gui/gui.cpp"
-#include "../engine/engine.cpp"
 #include "../board/board.cpp"
-#include "../utils/utils.cpp"
+#include "../engine/engine.cpp"
 
 class Minesweeper{
     

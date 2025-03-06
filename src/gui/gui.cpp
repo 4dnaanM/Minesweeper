@@ -2,9 +2,6 @@
 #define MINESWEEPER_GUI
 
 #include "../utils/utils.cpp"
-#include <SFML/Graphics.hpp>
-#include <iostream>
-#include <vector>
 
 class AbstractGUI{
 public: 

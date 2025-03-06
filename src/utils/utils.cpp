@@ -1,10 +1,7 @@
-#include <vector>
-
 #ifndef UTILS
 #define UTILS
 
-#include <vector>
-#include <SFML/Graphics.hpp>
+#include "../lib/lib.h"
 
 struct GameParams{
     int L = 30; 
