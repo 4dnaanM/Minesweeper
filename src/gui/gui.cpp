@@ -6,7 +6,7 @@
 class AbstractGUI{
 public: 
     virtual int takeInteractiveInput(Move& Move) = 0;
-    virtual int displayBoard(GameParams params, const GameBoard& gameBoard, const UserBoard& userBoard) = 0;
+    virtual int displayBoard(GameParams params, const Board& gameBoard, const Board& userBoard) = 0;
     virtual void closeWindow() = 0;
     virtual bool windowIsOpen() = 0;
 };
@@ -31,21 +31,6 @@ class MinesweeperGUI{
     };
     std::vector<sf::Texture> textures;
     std::vector<sf::Sprite> sprites;
-
-    int convertToInt(GameCellState C){
-        switch(C){
-            case GAME_EMPTY: return 0;
-            case GAME_ONE: return 1;
-            case GAME_TWO: return 2;
-            case GAME_THREE: return 3;
-            case GAME_FOUR: return 4;
-            case GAME_FIVE: return 5;
-            case GAME_SIX: return 6;
-            case GAME_SEVEN: return 7;
-            case GAME_EIGHT: return 8;
-            default: return 0; // This should never be reached
-        }
-    }
 
     int getCellCoordinates(int& y, int& x, int click_y, int click_x){
         sf::View view = window.getView();
@@ -91,15 +76,15 @@ public:
         return 0;
     }
 
-    int displayBoard(GameParams p, const GameBoard& gameBoard, const UserBoard& userBoard){
+    int displayBoard(GameParams p, const Board& gameBoard, const Board& userBoard){
         window.clear(sf::Color::White);
         for (int y = 0; y < params.W; y++) {
             for (int x = 0; x < params.L; x++) {
                 int state; 
-                if(p.gameOver && gameBoard[y][x]==GAME_MINE)state = 11;
-                else if(userBoard[y][x]==USER_FLAGGED)state = 10;
-                else if(userBoard[y][x]==USER_HIDDEN)state = 9;
-                else state = convertToInt(gameBoard[y][x]);
+                if(p.gameOver && gameBoard[y][x]==CellState::MINE)state = 11;
+                else if(userBoard[y][x]==CellState::FLAGGED)state = 10;
+                else if(userBoard[y][x]==CellState::HIDDEN)state = 9;
+                else state = gameBoard[y][x];
 
                 sf::Sprite& sprite = sprites[state];
 
