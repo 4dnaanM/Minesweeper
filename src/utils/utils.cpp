@@ -47,11 +47,6 @@ struct Cell {
 
     Cell(CellState s = CellState::EMPTY) : state(s) {}
 
-    Cell& operator=(int value) {
-        state = toCellState(value);
-        return *this;
-    }
-
     bool operator==(const CellState& s) const {
         return this->state == s;
     }
@@ -62,6 +57,20 @@ struct Cell {
 
     operator int() const {
         return static_cast<int>(state);
+    }
+    
+    Cell& operator=(int value) {
+        state = toCellState(value);
+        return *this;
+    }
+    bool operator==(int value) const {
+        return int(state) == value;
+    }
+    bool operator>=(int value) const {
+        return int(state) >= value;
+    }
+    bool operator<=(int value) const {
+        return int(state) <= value;
     }
 
     static CellState toCellState(int value) {
