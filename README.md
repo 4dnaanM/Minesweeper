@@ -8,10 +8,10 @@ My motivation to build this was that I was curious to try out the process of bui
 
 ## Features
 
-- **Fully Functional Minesweeper Logic**: 16x30 game board with 99 mines
-- **Game Dynamics**: Dynamic updates of game board when you flag or reveals cells. Win by correctly flagging all mines.
-- **Graphical User Interface**: To visualize the game board and flag or reveal cells through Mouse Clicks. 
-- **Helper Engine**: Option to set engine to play deterministic moves quickly. Developing more functionality
+- **Fully Functional Minesweeper Logic**
+- **Graphical User Interface**
+- **Helper Engine**
+- **Optimal Engine**: In Progress!
 
 ## Installation and Setup
 
@@ -23,8 +23,7 @@ My motivation to build this was that I was curious to try out the process of bui
 
 ### Project Structure
 - **`assets/`**: Directory for texture files used for the game board.
-- **`src/core/game.cpp`**: Contains all the logic and rendering code.
-- **`src/gui/gui.cpp`**: Code that implements interactive GUI.
+- **`src/` **:  Contains all the code for game logic, engine logic and rendering.
 - **`src/engine/engine.cpp`**:
   - Basic Engine Implementation that makes deterministic moves. Will add hint option to GUI later.
   - In process: Adding more deterministic moves from modeling revealed board as set of constraints on cells.
@@ -37,15 +36,14 @@ My motivation to build this was that I was curious to try out the process of bui
    git clone https://github.com/4dnaanM/Minesweeper.git
    cd Minesweeper
    ```
-2. If g++ is your preferred C++ compiler, use the provided makefile to compile and run: 
+2. If g++ is your preferred C++ compiler, use the executable directly or use the provided makefile to compile and run: 
    ```bash
-   make build
-   make run
+   make
    ```
    Else, follow step 3 and 4: 
 3. Compile the program using your preferred C++ compiler. Example for g++:
     ```bash
-    g++ -std=c++14 -I/opt/homebrew/include -L/opt/homebrew/lib -lsfml-graphics -lsfml-window -lsfml-system src/core/game.cpp src/gui/gui.cpp -o bin/minesweeper
+    g++ -std=c++14 -I/opt/homebrew/include -L/opt/homebrew/lib -lsfml-graphics -lsfml-window -lsfml-system src/utils/utils.cpp src/core/game.cpp src/board/board.cpp src/gui/gui.cpp src/engine/engine.cpp -o bin/minesweeper
     ```
     make sure to include and link the correct files as shown above. If all goes well, you should have an executable in the bin folder.
 4. Run the executable: This will allow you to use the GUI and play the game. Engine is not enabled by default.
@@ -54,21 +52,14 @@ My motivation to build this was that I was curious to try out the process of bui
     ```
 
 ## Gameplay Instructions
-1. Launch the game to see the Minesweeper board rendered in a window.
-2. Controls:
+1. Controls:
 - **Left-click**: Reveal a cell.
 - **Right-click**: Flag or unflag a hidden cell, or reveal all hidden cells neighbouring a satisfied revealed cell (see: [chording](https://minesweeper.fandom.com/wiki/Chording)). 
-
 The game ends if:
 - All mines are flagged correctly (win).
 - A mine is revealed or 99 flags are placed, atleast one of which is wrong (loss).
 
 ## Asset Details
-- The game uses sprite textures for visual representation:
-    - Hidden cells
-    - Flagged cells
-    - Revealed cells with numbers (1-8)
-    - Mines
 - Place all required files in the ```assets``` folder.
 ```bash
 assets/
