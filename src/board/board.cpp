@@ -1,11 +1,14 @@
-#include <iostream>
-#include <vector>
-#include <random>
-#include <chrono>
-#include <thread>
-#include <ctime>
+#ifndef BOARD
+#define BOARD
+
+#include "../utils/utils.cpp"
+
 
 class MinesweeperBoard{
+
+
+    std::vector<int> traverse_x = {-1,0,1,-1,1,-1,0,1};
+    std::vector<int> traverse_y = {-1,-1,-1,0,0,1,1,1};
 
     int generateMines(){
         srand(time(0));
@@ -17,15 +20,15 @@ class MinesweeperBoard{
             int random_y = random_position/L;
             int random_x = random_position%L;
 
-            if(gameBoard[random_y][random_x]!=MINE){
-                gameBoard[random_y][random_x]=MINE;
+            if(gameBoard[random_y][random_x]!=CellState::MINE){
+                gameBoard[random_y][random_x]=CellState::MINE;
                 placedMines++;
             }
         }
 
         for(int x = 0; x < L; x++){
             for(int y = 0; y < W; y++){
-                if(gameBoard[y][x]!=MINE)gameBoard[y][x] = countNeighbouringMines(y,x);
+                if(gameBoard[y][x]!=CellState::MINE)gameBoard[y][x] = countNeighbouringMines(y,x);
             }
         }
         return 0; 
@@ -39,14 +42,11 @@ class MinesweeperBoard{
         
         int neighbouring = 0; 
 
-        int x_vals[] = {-1,0,1,-1,1,-1,0,1};
-        int y_vals[] = {-1,-1,-1,0,0,1,1,1};
-
         for (int neighbor = 0; neighbor<8; neighbor++){    
-            int n_x = x+x_vals[neighbor];
-            int n_y = y+y_vals[neighbor];
+            int n_x = x+traverse_x[neighbor];
+            int n_y = y+traverse_y[neighbor];
             if(inBoard(n_y,n_x)){
-                neighbouring+=(userBoard[n_y][n_x]==FLAGGED);
+                neighbouring+=(userBoard[n_y][n_x]==CellState::FLAGGED);
             }
         }
         return neighbouring;
@@ -56,30 +56,25 @@ class MinesweeperBoard{
         
         int neighbouring = 0; 
 
-        int x_vals[] = {-1,0,1,-1,1,-1,0,1};
-        int y_vals[] = {-1,-1,-1,0,0,1,1,1};
-
         for (int neighbor = 0; neighbor<8; neighbor++){    
-            int n_x = x+x_vals[neighbor];
-            int n_y = y+y_vals[neighbor];
+            int n_x = x+traverse_x[neighbor];
+            int n_y = y+traverse_y[neighbor];
             if(inBoard(n_y,n_x)){
-                neighbouring+=(gameBoard[n_y][n_x]==MINE);
+                neighbouring += (gameBoard[n_y][n_x] == CellState::MINE);
             }
         }
+
         return neighbouring;
     }
 
     int chord(int y, int x, bool& gameOver){
 
-        int x_vals[] = {-1,0,1,-1,1,-1,0,1};
-        int y_vals[] = {-1,-1,-1,0,0,1,1,1};
-
         for (int neighbor = 0; neighbor<8; neighbor++){    
-            int n_x = x+x_vals[neighbor];
-            int n_y = y+y_vals[neighbor];
-            if(inBoard(n_y,n_x)&&userBoard[n_y][n_x]==HIDDEN){
+            int n_x = x+traverse_x[neighbor];
+            int n_y = y+traverse_y[neighbor];
+            if(inBoard(n_y,n_x)&&userBoard[n_y][n_x]==CellState::HIDDEN){
                 // if it is hidden, click on it.
-                if(gameBoard[n_y][n_x]==MINE){
+                if(gameBoard[n_y][n_x]==CellState::MINE){
                     gameOver = true;
                 }
                 else{
@@ -92,21 +87,18 @@ class MinesweeperBoard{
 
     int updateUserBoard(int y,int x){
         if(!inBoard(y,x))return 0;
+        if(userBoard[y][x]!=CellState::HIDDEN)return 0;
+        // not intended to be called on a mine
+        assert(gameBoard[y][x] != CellState::MINE);
         
-        if(userBoard[y][x]!=HIDDEN)return 0;
-        
-        userBoard[y][x]=gameBoard[y][x];
+        userBoard[y][x] = gameBoard[y][x];
 
         int neighbouringMines = countNeighbouringMines(y,x); 
 
         if(neighbouringMines==0){
-
-            int x_vals[] = {-1,0,1,-1,1,-1,0,1};
-            int y_vals[] = {-1,-1,-1,0,0,1,1,1};
-
             for (int neighbor = 0; neighbor<8; neighbor++){
-                int n_x = x+x_vals[neighbor];
-                int n_y = y+y_vals[neighbor];
+                int n_x = x+traverse_x[neighbor];
+                int n_y = y+traverse_y[neighbor];
                 updateUserBoard(n_y,n_x);
             }
         }
@@ -114,41 +106,36 @@ class MinesweeperBoard{
     }
 
 public:
-    int L = 30; 
-    int W = 16;
+    int L;
+    int W;
+    int totalMines;
+    Board gameBoard;
+    Board userBoard;
+    Board board; 
     
-    //  _ _ _ _ _ _ _ _
-    // |_|_|_|_|_|_|_|_| |
-    // |_|_|_|_|_|_|_|_| W
-    // |_|_|_|_|_|_|_|_| |
-    // <-------L------->
-    
-    int totalMines = 99; 
-
-    int MINE = -1; 
-    int FLAGGED = -1;
-    int HIDDEN = -2;
-
-    std::vector<std::vector<int>> gameBoard                             // mine -> -1, else {0,1,2,3,4,5,6,7,8}
-        = std::vector<std::vector<int>>(W, std::vector<int>(L,0));
-    std::vector<std::vector<int>> userBoard                             // has values FLAGGED, HIDDEN or number
-        = std::vector<std::vector<int>>(W, std::vector<int>(L,HIDDEN));
-    
-    MinesweeperBoard(){
-        userBoard = std::vector<std::vector<int>>(W,std::vector<int>(L,HIDDEN));
-        gameBoard = std::vector<std::vector<int>>(W,std::vector<int>(L,0));
+    MinesweeperBoard(GameParams p){
+        L = p.L;
+        W = p.W;
+        totalMines = p.totalMines;
+        gameBoard = Board(W, std::vector<Cell>(L,CellState::EMPTY));
+        userBoard = Board(W, std::vector<Cell>(L,CellState::HIDDEN));
         generateMines();
+    }
+
+    MinesweeperBoard(){
+        GameParams p = GameParams();
+        *this = MinesweeperBoard(p);
     }
     
     bool gameIsCorrect(){
         for (int x = 0; x < L; x++){
             for (int y = 0; y < W; y++){
 
-                if(gameBoard[y][x]==MINE && userBoard[y][x]!=FLAGGED){
+                if(gameBoard[y][x]==CellState::MINE && userBoard[y][x]!=CellState::FLAGGED){
                     return false;
                 }
                 
-                if(userBoard[y][x]==FLAGGED && gameBoard[y][x]!=MINE){
+                if(userBoard[y][x]==CellState::FLAGGED && gameBoard[y][x]!=CellState::MINE){
                     return false;
                 }
 
@@ -156,32 +143,34 @@ public:
         }
         return true;
     }
-
     
-    int playInput(int y, int x, bool F, int& remainingMinesCount, bool& gameOver){
+    int playInput(Move M, GameParams& params){
+        int y = std::get<0>(M);
+        int x = std::get<1>(M);
+        ClickType C = std::get<2>(M);
+
         if(!inBoard(y,x)){
-            // std::cout<<"Out of board!\n";
             return 0;
         }
-        if(F){
-            if(userBoard[y][x]==HIDDEN){
-                remainingMinesCount--;
-                userBoard[y][x] = FLAGGED;
+        if(C == RIGHT_CLICK){
+            if(userBoard[y][x]==CellState::HIDDEN){
+                params.remainingMinesCount--;
+                userBoard[y][x] = CellState::FLAGGED;
             }
-            else if(userBoard[y][x]==FLAGGED){
-                remainingMinesCount++;
-                userBoard[y][x] = HIDDEN;
+            else if(userBoard[y][x]==CellState::FLAGGED){
+                params.remainingMinesCount++;
+                userBoard[y][x] = CellState::HIDDEN;
             }
             else{
                 int nFlags = countNeighbouringFlags(y,x);
-                if(nFlags==gameBoard[y][x])chord(y,x,gameOver);
+                if(nFlags==gameBoard[y][x])chord(y,x,params.gameOver);
             }
         }
         else {
-            if(gameBoard[y][x]==MINE){
-                gameOver = true;
+            if(gameBoard[y][x]==CellState::MINE){
+                params.gameOver = true;
             }
-            else if(userBoard[y][x]==HIDDEN){
+            else if(userBoard[y][x]==CellState::HIDDEN){
                 updateUserBoard(y,x);
                 
             }
@@ -191,3 +180,5 @@ public:
     }
         
 };
+
+#endif

@@ -1,16 +1,20 @@
-#include <SFML/Graphics.hpp>
-#include <iostream>
-#include <vector>
+#ifndef MINESWEEPER_GUI
+#define MINESWEEPER_GUI
+
+#include "../utils/utils.cpp"
 
 class AbstractGUI{
 public: 
-    virtual int takeInteractiveInput(int& y, int& x, bool& F) = 0;
-    virtual int displayBoard(const int gameOver, const std::vector<std::vector<int>>& gameBoard, const std::vector<std::vector<int>>& userBoard) = 0;
+    virtual int takeInteractiveInput(Move& Move) = 0;
+    virtual int displayBoard(GameParams params, const Board& gameBoard, const Board& userBoard) = 0;
     virtual void closeWindow() = 0;
     virtual bool windowIsOpen() = 0;
 };
 
 class MinesweeperGUI{
+    GUIParams params;
+    sf::RenderWindow window;
+
     std::vector<std::string> TEXTURE_PATHS = {
         "assets/0.svg.png",       // Revealed empty cell
         "assets/1.svg.png",       // Number 1
@@ -25,18 +29,8 @@ class MinesweeperGUI{
         "assets/Flag.svg.png",    // Flagged cell
         "assets/Mine.svg.png"     // Mine
     };
-
-    std::vector<sf::Texture> textures; 
-    std::vector<sf::Sprite> sprites; 
-
-    int CELL_SIZE = 40;
-    int L;
-    int W;
-    int MINE; 
-    int HIDDEN; 
-    int FLAGGED;
-
-    sf::RenderWindow window;
+    std::vector<sf::Texture> textures;
+    std::vector<sf::Sprite> sprites;
 
     int getCellCoordinates(int& y, int& x, int click_y, int click_x){
         sf::View view = window.getView();
@@ -46,13 +40,13 @@ class MinesweeperGUI{
         float scale_x = viewSize.x / windowSize.x;
         float scale_y = viewSize.y / windowSize.y;
         
-        x = click_x*scale_x/CELL_SIZE;
-        y = click_y*scale_y/CELL_SIZE;
+        x = click_x*scale_x/params.CELL_SIZE;
+        y = click_y*scale_y/params.CELL_SIZE;
         return 0; 
     }
 
 public: 
-    int takeInteractiveInput(int& y, int& x, bool& F){
+    int takeInteractiveInput(Move& move){
         sf::Event event;
         while(window.waitEvent(event)){
             if (event.type == sf::Event::Closed){
@@ -62,37 +56,42 @@ public:
             else if (event.type == sf::Event::MouseButtonPressed){
                 int click_x = event.mouseButton.x;
                 int click_y = event.mouseButton.y;
-
-                getCellCoordinates(y,x,click_y,click_x);
                 
+                int y;
+                int x;
+                ClickType F;
+                
+                getCellCoordinates(y,x,click_y,click_x);
+
                 if(event.mouseButton.button == sf::Mouse::Left){
-                    F = false;
+                    F = LEFT_CLICK;
                 }
                 else if(event.mouseButton.button == sf::Mouse::Right){
-                    F = true;
+                    F = RIGHT_CLICK;
                 }
+                move = std::make_tuple(y,x,F);
                 return 0;
             }
         }
         return 0;
     }
 
-    int displayBoard(const int gameOver, const std::vector<std::vector<int>>& gameBoard, const std::vector<std::vector<int>>& userBoard){
+    int displayBoard(GameParams p, const Board& gameBoard, const Board& userBoard){
         window.clear(sf::Color::White);
-        for (int y = 0; y < W; y++) {
-            for (int x = 0; x < L; x++) {
+        for (int y = 0; y < params.W; y++) {
+            for (int x = 0; x < params.L; x++) {
                 int state; 
-                if(gameOver && gameBoard[y][x]==MINE)state = 11;
-                else if(userBoard[y][x]==FLAGGED)state = 10;
-                else if(userBoard[y][x]==HIDDEN)state = 9;
+                if(p.gameOver && gameBoard[y][x]==CellState::MINE)state = 11;
+                else if(userBoard[y][x]==CellState::FLAGGED)state = 10;
+                else if(userBoard[y][x]==CellState::HIDDEN)state = 9;
                 else state = gameBoard[y][x];
 
                 sf::Sprite& sprite = sprites[state];
 
-                sprite.setPosition(x * CELL_SIZE, y * CELL_SIZE);
+                sprite.setPosition(x * params.CELL_SIZE, y * params.CELL_SIZE);
                 sprite.setScale(
-                    static_cast<float>(CELL_SIZE) / textures[state].getSize().x,
-                    static_cast<float>(CELL_SIZE) / textures[state].getSize().y
+                    static_cast<float>(params.CELL_SIZE) / textures[state].getSize().x,
+                    static_cast<float>(params.CELL_SIZE) / textures[state].getSize().y
                 );
                 window.draw(sprite);
                 
@@ -102,27 +101,32 @@ public:
         return 0; 
     }
 
-    MinesweeperGUI(int L, int W, int MINE, int HIDDEN, int FLAGGED): 
-    L(L), W(W), 
-    MINE(MINE), HIDDEN(HIDDEN), FLAGGED(FLAGGED), 
-    window(sf::VideoMode(L * CELL_SIZE, W * CELL_SIZE), "Minesweeper")
-    {
+    MinesweeperGUI(GameParams p, int CELL_SIZE){
+        params = GUIParams(p.L, p.W, CELL_SIZE);
         for (auto path : TEXTURE_PATHS) {
             sf::Texture texture;
-
-            if (!texture.loadFromFile(path)) {
-                std::cerr << "Failed to load texture: " << path << "\n";
-                continue; 
-            }
-
+            texture.loadFromFile(path);
             textures.push_back(texture);
-            
         }
-
         for(int i = 0; i< textures.size(); i++){
             sf::Sprite sprite(textures[i]);
             sprites.push_back(sprite);
         }
+        window.create(sf::VideoMode(p.L*CELL_SIZE, p.W*CELL_SIZE), "Minesweeper");
+    }
+    MinesweeperGUI(){
+        GameParams p = GameParams();
+        GUIParams params = GUIParams(p.L, p.W, 40);
+        for (auto path : TEXTURE_PATHS) {
+            sf::Texture texture;
+            texture.loadFromFile(path);
+            textures.push_back(texture);
+        }
+        for(int i = 0; i< textures.size(); i++){
+            sf::Sprite sprite(textures[i]);
+            sprites.push_back(sprite);
+        }
+        window.create(sf::VideoMode(params.L*40, params.W*40), "Minesweeper");
     }
 
     void closeWindow(){
@@ -134,3 +138,5 @@ public:
         return window.isOpen();
     }
 };
+
+#endif

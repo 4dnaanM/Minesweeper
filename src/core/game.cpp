@@ -1,18 +1,13 @@
-#include <iostream>
-#include <vector>
-#include <random>
-#include <chrono>
-#include <thread>
-#include <ctime>
+#ifndef MINESWEEPER
+#define MINESWEEPER
 
 #include "../gui/gui.cpp"
-#include "../engine/engine.cpp"
 #include "../board/board.cpp"
+#include "../engine/engine.cpp"
 
 class Minesweeper{
     
-    bool gameOver;
-    int remainingMinesCount; 
+    GameParams params;
 
     MinesweeperBoard board;
     MinesweeperGUI GUI;
@@ -20,34 +15,31 @@ class Minesweeper{
 
 public:
     Minesweeper():
-        board(),
-        GUI(board.L, board.W, board.MINE, board.HIDDEN, board.FLAGGED),
-        engine(board.L, board.W){
-            gameOver = false;
-            remainingMinesCount = board.totalMines;
-        }
+        params(),
+        board(params),
+        GUI(params, 40),
+        engine(params)
+        {}
 
     int runGUI(){
 
-        GUI.displayBoard(gameOver, board.gameBoard, board.userBoard);
+        GUI.displayBoard(params, board.gameBoard, board.userBoard);
 
         while(GUI.windowIsOpen()){
-            while(!gameOver && remainingMinesCount>0){
-                int play_x; 
-                int play_y;
-                bool play_F;
-                GUI.takeInteractiveInput(play_y, play_x, play_F);
-                board.playInput(play_y,play_x,play_F, remainingMinesCount, gameOver);
-                GUI.displayBoard(gameOver, board.gameBoard, board.userBoard);
+            while(!params.gameOver && params.remainingMinesCount>0){
+                Move M;
+                GUI.takeInteractiveInput(M);
+                board.playInput(M, params);
+                GUI.displayBoard(params, board.gameBoard, board.userBoard);
             }
-            if(remainingMinesCount==0 && board.gameIsCorrect()){
+            if(params.remainingMinesCount==0 && board.gameIsCorrect()){
                 // win
-                GUI.displayBoard(gameOver, board.gameBoard, board.userBoard);
+                GUI.displayBoard(params, board.gameBoard, board.userBoard);
                 break; 
             }
             else{
                 // loss
-                GUI.displayBoard(gameOver, board.gameBoard, board.userBoard);
+                GUI.displayBoard(params, board.gameBoard, board.userBoard);
                 break; 
             }
         }
@@ -58,33 +50,31 @@ public:
 
     int runEngine(){
 
-        GUI.displayBoard(gameOver, board.gameBoard, board.userBoard);
+        GUI.displayBoard(params, board.gameBoard, board.userBoard);
 
         while(GUI.windowIsOpen()){
-            while(!gameOver && remainingMinesCount>0){
-                int play_x; 
-                int play_y;
-                bool play_F;
-                GUI.takeInteractiveInput(play_y, play_x, play_F);
-                board.playInput(play_y,play_x,play_F, remainingMinesCount, gameOver);
-                GUI.displayBoard(gameOver, board.gameBoard, board.userBoard);
-                std::vector<std::tuple<int,int,int>> moves = engine.returnMoves(board.userBoard);
+            while(!params.gameOver && params.remainingMinesCount>0){
+                Move M;
+                GUI.takeInteractiveInput(M);
+                board.playInput(M, params);
+                GUI.displayBoard(params, board.gameBoard, board.userBoard);
+                std::vector<Move> moves = engine.returnMoves(board.userBoard);
 
                 for(auto move: moves){
-                    board.playInput(std::get<0>(move),std::get<1>(move),std::get<2>(move)==1,remainingMinesCount,gameOver);
+                    board.playInput(move,params);
                     // std::this_thread::sleep_for(std::chrono::milliseconds(500));
-                    GUI.displayBoard(gameOver, board.gameBoard, board.userBoard);
-                    if(gameOver)break;
+                    GUI.displayBoard(params, board.gameBoard, board.userBoard);
+                    if(params.gameOver)break;
                 }
             }
-            if(remainingMinesCount==0 && board.gameIsCorrect()){
+            if(params.remainingMinesCount==0 && board.gameIsCorrect()){
                 // win
-                GUI.displayBoard(gameOver, board.gameBoard, board.userBoard);
+                GUI.displayBoard(params, board.gameBoard, board.userBoard);
                 break; 
             }
             else{
                 // loss
-                GUI.displayBoard(gameOver, board.gameBoard, board.userBoard);
+                GUI.displayBoard(params, board.gameBoard, board.userBoard);
                 break; 
             }
         }
@@ -98,6 +88,7 @@ public:
 
 int main(){
     Minesweeper Minesweeper; 
-    Minesweeper.runGUI();
+    Minesweeper.runEngine();
 }
 
+#endif
